@@ -1,0 +1,438 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LibraryHub | Elite Academic Platform</title>
+    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    
+    <style>
+        /* --- WORLD-CLASS UI VARIABLES --- */
+        :root {
+            --primary: #4f46e5;
+            --primary-hover: #4338ca;
+            --secondary: #7c3aed;
+            --bg-base: #f1f5f9;
+            --text-dark: #0f172a;
+            --text-muted: #64748b;
+            --glass-bg: rgba(255, 255, 255, 0.7);
+            --glass-border: rgba(255, 255, 255, 0.5);
+            --shadow-sm: 0 4px 6px -1px rgba(0,0,0,0.05);
+            --shadow-lg: 0 20px 25px -5px rgba(0,0,0,0.1), 0 8px 10px -6px rgba(0,0,0,0.1);
+            --radius-lg: 24px;
+            --radius-md: 16px;
+            --transition: all 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        * { margin: 0; padding: 0; box-sizing: border-box; font-family: 'Plus Jakarta Sans', sans-serif; }
+        body { background: var(--bg-base); color: var(--text-dark); overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column; }
+        
+        /* --- ANIMATED BACKGROUND --- */
+        .bg-shapes { position: fixed; top: 0; left: 0; width: 100vw; height: 100vh; z-index: -1; overflow: hidden; background: #e2e8f0; }
+        .shape { position: absolute; filter: blur(80px); opacity: 0.6; animation: float 10s infinite alternate ease-in-out; }
+        .shape-1 { top: -10%; left: -10%; width: 50vw; height: 50vw; background: #c7d2fe; animation-delay: 0s; }
+        .shape-2 { bottom: -10%; right: -10%; width: 60vw; height: 60vw; background: #ddd6fe; animation-delay: -5s; }
+        @keyframes float { 0% { transform: translate(0, 0) scale(1); } 100% { transform: translate(5%, 5%) scale(1.1); } }
+
+        /* --- UTILITIES --- */
+        .hidden { display: none !important; }
+        .glass { background: var(--glass-bg); backdrop-filter: blur(20px); -webkit-backdrop-filter: blur(20px); border: 1px solid var(--glass-border); box-shadow: var(--shadow-sm); }
+        .gradient-text { background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        /* --- LOGIN SCREEN --- */
+        #login-view { height: 100vh; display: flex; align-items: center; justify-content: center; padding: 20px; }
+        .login-card { max-width: 440px; width: 100%; padding: 3rem 2.5rem; border-radius: var(--radius-lg); text-align: center; animation: slideUp 0.6s ease-out; }
+        .login-card h1 { font-size: 2.5rem; font-weight: 800; margin-bottom: 0.5rem; }
+        .login-card p { color: var(--text-muted); margin-bottom: 2.5rem; font-size: 1.1rem; }
+        
+        .google-btn {
+            display: flex; align-items: center; justify-content: center; gap: 12px; width: 100%; padding: 1rem;
+            background: white; border: 1px solid #e2e8f0; border-radius: 12px; font-size: 1.1rem; font-weight: 600;
+            color: #334155; cursor: pointer; transition: var(--transition); box-shadow: var(--shadow-sm);
+        }
+        .google-btn:hover { transform: translateY(-3px); box-shadow: 0 10px 15px -3px rgba(0,0,0,0.1); border-color: #cbd5e1; }
+        .google-btn svg { width: 24px; height: 24px; }
+
+        /* --- APP LAYOUT --- */
+        #app-view { display: flex; min-height: 100vh; opacity: 0; animation: fadeIn 0.5s forwards; }
+        
+        /* SIDEBAR */
+        .sidebar { width: 280px; padding: 2rem; display: flex; flex-direction: column; border-right: 1px solid rgba(255,255,255,0.4); }
+        .logo { font-size: 1.8rem; font-weight: 800; margin-bottom: 3rem; display: flex; align-items: center; gap: 10px; }
+        .nav-item { padding: 1rem 1.2rem; margin-bottom: 0.5rem; border-radius: 12px; cursor: pointer; color: var(--text-muted); font-weight: 600; transition: var(--transition); display: flex; align-items: center; gap: 12px; }
+        .nav-item:hover { background: rgba(255,255,255,0.5); color: var(--primary); }
+        .nav-item.active { background: white; color: var(--primary); box-shadow: var(--shadow-sm); }
+        
+        /* MAIN CONTENT */
+        .main-content { flex-grow: 1; padding: 2rem 3rem; max-width: 1400px; margin: 0 auto; width: 100%; }
+        header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 3rem; }
+        .page-title { font-size: 2.2rem; font-weight: 700; color: var(--text-dark); }
+        
+        /* USER PROFILE */
+        .user-profile { display: flex; align-items: center; gap: 1rem; background: white; padding: 0.5rem 1.5rem 0.5rem 0.5rem; border-radius: 50px; box-shadow: var(--shadow-sm); cursor: pointer; transition: var(--transition); border: 1px solid var(--glass-border); }
+        .user-profile:hover { box-shadow: var(--shadow-lg); }
+        .user-avatar { width: 44px; height: 44px; border-radius: 50%; object-fit: cover; }
+        .user-info { display: flex; flex-direction: column; }
+        .user-name { font-weight: 700; font-size: 0.95rem; line-height: 1.2; }
+        .user-role { font-size: 0.75rem; color: var(--primary); font-weight: 600; text-transform: uppercase; letter-spacing: 0.5px; }
+
+        /* BENTO GRID (Dashboard) */
+        .bento-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 1.5rem; margin-bottom: 2rem; }
+        .bento-card { padding: 2rem; border-radius: var(--radius-lg); transition: var(--transition); display: flex; flex-direction: column; justify-content: center; }
+        .bento-card:hover { transform: translateY(-5px); box-shadow: var(--shadow-lg); }
+        .bento-card h3 { font-size: 1rem; color: var(--text-muted); font-weight: 600; margin-bottom: 0.5rem; }
+        .bento-card p { font-size: 2.5rem; font-weight: 800; color: var(--text-dark); }
+        
+        /* BOOK GRID */
+        .book-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(280px, 1fr)); gap: 2rem; }
+        .book-card { padding: 1.5rem; border-radius: var(--radius-lg); transition: var(--transition); display: flex; flex-direction: column; background: white; }
+        .book-card:hover { transform: translateY(-8px); box-shadow: var(--shadow-lg); }
+        .book-icon { width: 60px; height: 60px; border-radius: 16px; background: #eff6ff; display: flex; align-items: center; justify-content: center; font-size: 1.5rem; margin-bottom: 1.5rem; color: var(--primary); }
+        .book-title { font-size: 1.25rem; font-weight: 700; margin-bottom: 0.25rem; }
+        .book-author { color: var(--text-muted); font-size: 0.9rem; margin-bottom: 1.5rem; }
+        
+        /* BUTTONS */
+        .btn { padding: 0.8rem 1.5rem; border-radius: 12px; border: none; font-weight: 600; font-size: 0.95rem; cursor: pointer; transition: var(--transition); }
+        .btn-primary { background: var(--primary); color: white; box-shadow: 0 4px 14px 0 rgba(79, 70, 229, 0.39); }
+        .btn-primary:hover { background: var(--primary-hover); transform: translateY(-2px); box-shadow: 0 6px 20px rgba(79, 70, 229, 0.23); }
+        .btn-danger { background: #fee2e2; color: #ef4444; }
+        .btn-danger:hover { background: #fca5a5; color: white; }
+
+        /* TABLES */
+        .table-container { border-radius: var(--radius-lg); overflow: hidden; background: white; }
+        table { width: 100%; border-collapse: collapse; }
+        th { background: #f8fafc; padding: 1.2rem 1.5rem; text-align: left; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 1px; color: var(--text-muted); font-weight: 700; border-bottom: 1px solid #e2e8f0; }
+        td { padding: 1.2rem 1.5rem; border-bottom: 1px solid #f1f5f9; font-weight: 500; }
+        tr:hover td { background: #f8fafc; }
+        .badge { padding: 0.4rem 0.8rem; border-radius: 8px; font-size: 0.75rem; font-weight: 700; }
+        .badge-active { background: #dcfce7; color: #166534; }
+
+        /* LOADER */
+        #global-loader { position: fixed; inset: 0; background: var(--bg-base); display: flex; align-items: center; justify-content: center; z-index: 9999; flex-direction: column; gap: 20px; transition: opacity 0.5s; }
+        .spinner { width: 50px; height: 50px; border: 4px solid rgba(79, 70, 229, 0.2); border-top-color: var(--primary); border-radius: 50%; animation: spin 1s linear infinite; }
+
+        @keyframes spin { to { transform: rotate(360deg); } }
+        @keyframes slideUp { from { opacity: 0; transform: translateY(30px); } to { opacity: 1; transform: translateY(0); } }
+        @keyframes fadeIn { to { opacity: 1; } }
+    </style>
+</head>
+<body>
+
+<div class="bg-shapes">
+    <div class="shape shape-1"></div>
+    <div class="shape shape-2"></div>
+</div>
+
+<div id="global-loader">
+    <div class="spinner"></div>
+    <h3 style="color: var(--primary); font-weight: 700;">Loading LibraryHub...</h3>
+</div>
+
+<div id="login-view" class="hidden">
+    <div class="login-card glass">
+        <h1 class="gradient-text">LibraryHub</h1>
+        <p>Your portal to infinite knowledge.</p>
+        
+        <button class="google-btn" id="btn-google-login">
+            <svg viewBox="0 0 24 24">
+                <path d="M22.56 12.25c0-.78-.07-1.53-.2-2.25H12v4.26h5.92c-.26 1.37-1.04 2.53-2.21 3.31v2.77h3.57c2.08-1.92 3.28-4.74 3.28-8.09z" fill="#4285F4"/>
+                <path d="M12 23c2.97 0 5.46-.98 7.28-2.66l-3.57-2.77c-.98.66-2.23 1.06-3.71 1.06-2.86 0-5.29-1.93-6.16-4.53H2.18v2.84C3.99 20.53 7.7 23 12 23z" fill="#34A853"/>
+                <path d="M5.84 14.09c-.22-.66-.35-1.36-.35-2.09s.13-1.43.35-2.09V7.07H2.18C1.43 8.55 1 10.22 1 12s.43 3.45 1.18 4.93l2.85-2.22.81-.62z" fill="#FBBC05"/>
+                <path d="M12 5.38c1.62 0 3.06.56 4.21 1.64l3.15-3.15C17.45 2.09 14.97 1 12 1 7.7 1 3.99 3.47 2.18 7.07l3.66 2.84c.87-2.6 3.3-4.53 6.16-4.53z" fill="#EA4335"/>
+            </svg>
+            Continue with Google
+        </button>
+    </div>
+</div>
+
+<div id="app-view" class="hidden">
+    <aside class="sidebar glass">
+        <div class="logo">
+            <svg width="32" height="32" viewBox="0 0 24 24" fill="none" stroke="var(--primary)" stroke-width="2.5" stroke-linecap="round" stroke-linejoin="round"><path d="M4 19.5v-15A2.5 2.5 0 0 1 6.5 2H20v20H6.5a2.5 2.5 0 0 1 0-5H20"/></svg>
+            <span class="gradient-text">LibraryHub</span>
+        </div>
+        
+        <nav style="flex-grow: 1;">
+            <p style="font-size: 0.75rem; font-weight: 700; color: var(--text-muted); margin-bottom: 1rem; text-transform: uppercase;">Menu</p>
+            <div class="nav-item active" data-target="dashboard">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="3" width="7" height="9" rx="1"/><rect x="14" y="3" width="7" height="5" rx="1"/><rect x="14" y="12" width="7" height="9" rx="1"/><rect x="3" y="16" width="7" height="5" rx="1"/></svg>
+                Dashboard
+            </div>
+            <div class="nav-item" data-target="catalog">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M2 3h6a4 4 0 0 1 4 4v14a3 3 0 0 0-3-3H2z"/><path d="M22 3h-6a4 4 0 0 0-4 4v14a3 3 0 0 1 3-3h7z"/></svg>
+                Library Catalog
+            </div>
+            <div class="nav-item" data-target="borrows">
+                <svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"/></svg>
+                My Borrows
+            </div>
+        </nav>
+        
+        <button class="btn btn-danger" id="btn-logout" style="width: 100%; display: flex; align-items: center; justify-content: center; gap: 8px;">
+            <svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M9 21H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2h4"/><polyline points="16 17 21 12 16 7"/><line x1="21" y1="12" x2="9" y2="12"/></svg>
+            Sign Out
+        </button>
+    </aside>
+
+    <main class="main-content">
+        <header>
+            <h1 class="page-title" id="page-title">Dashboard</h1>
+            <div class="user-profile">
+                <img src="https://ui-avatars.com/api/?name=User&background=4f46e5&color=fff" id="nav-avatar" class="user-avatar" alt="User">
+                <div class="user-info">
+                    <span class="user-name" id="nav-name">Loading...</span>
+                    <span class="user-role" id="nav-role">Student</span>
+                </div>
+            </div>
+        </header>
+
+        <section id="view-dashboard" class="view-section">
+            <div class="bento-grid">
+                <div class="bento-card glass">
+                    <h3>Total Books Cataloged</h3>
+                    <p id="stat-total-books">0</p>
+                </div>
+                <div class="bento-card glass">
+                    <h3>My Active Borrows</h3>
+                    <p id="stat-my-borrows" style="color: var(--primary);">0</p>
+                </div>
+            </div>
+            
+            <h2 style="margin-bottom: 1.5rem; font-size: 1.25rem; font-weight: 700;">Recently Added Books</h2>
+            <div class="book-grid" id="recent-books-grid"></div>
+        </section>
+
+        <section id="view-catalog" class="view-section hidden">
+            <div class="book-grid" id="catalog-grid"></div>
+        </section>
+
+        <section id="view-borrows" class="view-section hidden">
+            <div class="table-container glass">
+                <table>
+                    <thead><tr><th>Book Title</th><th>Date Borrowed</th><th>Status</th></tr></thead>
+                    <tbody id="borrows-table-body"></tbody>
+                </table>
+            </div>
+        </section>
+    </main>
+</div>
+
+<script type="module">
+    // --- 1. FIREBASE SETUP ---
+    import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
+    import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
+    import { getFirestore, collection, doc, getDoc, setDoc, getDocs, addDoc, updateDoc, onSnapshot, query, where, orderBy } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
+
+    const firebaseConfig = {
+        apiKey: "AIzaSyAQYfWb81B89vmT0_ypZF3VNEhTtDV0hoA",
+        authDomain: "libraryhub-3e6be.firebaseapp.com",
+        projectId: "libraryhub-3e6be",
+        storageBucket: "libraryhub-3e6be.firebasestorage.app",
+        messagingSenderId: "843399614230",
+        appId: "1:843399614230:web:b8fca579c633f350908a37"
+    };
+
+    const app = initializeApp(firebaseConfig);
+    const auth = getAuth(app);
+    const db = getFirestore(app);
+    const provider = new GoogleAuthProvider();
+
+    // --- 2. GLOBAL STATE ---
+    let currentUser = null;
+    let booksData = [];
+    let borrowsData = [];
+
+    // --- 3. UI ELEMENTS ---
+    const loader = document.getElementById('global-loader');
+    const loginView = document.getElementById('login-view');
+    const appView = document.getElementById('app-view');
+
+    // --- 4. AUTHENTICATION LOGIC ---
+    // Handle Google Login Button Click
+    document.getElementById('btn-google-login').addEventListener('click', async () => {
+        try {
+            await signInWithPopup(auth, provider);
+        } catch (error) {
+            alert("Login Failed: " + error.message);
+        }
+    });
+
+    // Handle Logout Button Click
+    document.getElementById('btn-logout').addEventListener('click', () => {
+        signOut(auth);
+    });
+
+    // Listen to Auth State Changes
+    onAuthStateChanged(auth, async (user) => {
+        if (user) {
+            // User is signed in
+            loginView.classList.add('hidden');
+            loader.style.opacity = '1';
+            loader.classList.remove('hidden');
+
+            // Check if user exists in Firestore, if not, create them
+            const userRef = doc(db, "users", user.uid);
+            const userSnap = await getDoc(userRef);
+            
+            let role = "student"; // Default role
+            if (!userSnap.exists()) {
+                await setDoc(userRef, {
+                    name: user.displayName,
+                    email: user.email,
+                    photoURL: user.photoURL,
+                    role: "student",
+                    createdAt: Date.now()
+                });
+            } else {
+                role = userSnap.data().role;
+            }
+
+            // Set global user object
+            currentUser = { uid: user.uid, name: user.displayName, email: user.email, photo: user.photoURL, role: role };
+
+            // Update UI with user info
+            document.getElementById('nav-name').innerText = currentUser.name.split(' ')[0];
+            document.getElementById('nav-avatar').src = currentUser.photo || `https://ui-avatars.com/api/?name=${currentUser.name}&background=4f46e5&color=fff`;
+            document.getElementById('nav-role').innerText = currentUser.role;
+
+            // Initialize Data Listeners
+            initDataListeners();
+            
+            // Show App
+            setTimeout(() => {
+                loader.classList.add('hidden');
+                appView.classList.remove('hidden');
+            }, 800);
+
+        } else {
+            // User is signed out
+            currentUser = null;
+            appView.classList.add('hidden');
+            loader.classList.add('hidden');
+            loginView.classList.remove('hidden');
+        }
+    });
+
+    // --- 5. DATA FETCHING & RENDERING ---
+    function initDataListeners() {
+        // Listen to Books
+        onSnapshot(collection(db, "books"), (snapshot) => {
+            booksData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            
+            // Seed sample data if empty
+            if(booksData.length === 0) seedBooks(); 
+
+            renderCatalog();
+            renderDashboard();
+        });
+
+        // Listen to Current User's Borrows
+        const q = query(collection(db, "borrows"), where("userId", "==", currentUser.uid));
+        onSnapshot(q, (snapshot) => {
+            borrowsData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
+            renderBorrows();
+            renderDashboard();
+        });
+    }
+
+    function renderDashboard() {
+        document.getElementById('stat-total-books').innerText = booksData.length;
+        document.getElementById('stat-my-borrows').innerText = borrowsData.filter(b => b.status === 'Active').length;
+
+        // Render top 3 books on dashboard
+        const recentHtml = booksData.slice(0, 3).map(book => generateBookCard(book)).join('');
+        document.getElementById('recent-books-grid').innerHTML = recentHtml || "<p>No books available.</p>";
+    }
+
+    function renderCatalog() {
+        const html = booksData.map(book => generateBookCard(book)).join('');
+        document.getElementById('catalog-grid').innerHTML = html || "<p>No books available.</p>";
+    }
+
+    function renderBorrows() {
+        const html = borrowsData.map(b => `
+            <tr>
+                <td><strong>${b.bookTitle}</strong></td>
+                <td>${new Date(b.timestamp).toLocaleDateString()}</td>
+                <td><span class="badge badge-active">${b.status}</span></td>
+            </tr>
+        `).join('');
+        document.getElementById('borrows-table-body').innerHTML = html || "<tr><td colspan='3'>You haven't borrowed any books yet.</td></tr>";
+    }
+
+    function generateBookCard(book) {
+        return `
+            <div class="book-card glass">
+                <div class="book-icon">📚</div>
+                <h3 class="book-title">${book.title}</h3>
+                <p class="book-author">${book.author} • ${book.category}</p>
+                <div style="margin-top: auto;">
+                    <p style="font-size: 0.85rem; font-weight: 600; margin-bottom: 10px; color: ${book.stock > 0 ? 'var(--primary)' : 'var(--text-muted)'}">
+                        ${book.stock > 0 ? `${book.stock} Available` : 'Out of stock'}
+                    </p>
+                    <button class="btn btn-primary" style="width: 100%" 
+                        onclick="window.handleBorrow('${book.id}', '${book.title}', ${book.stock})"
+                        ${book.stock === 0 ? 'disabled style="background:#cbd5e1; cursor:not-allowed;"' : ''}>
+                        Borrow Book
+                    </button>
+                </div>
+            </div>
+        `;
+    }
+
+    // --- 6. ACTIONS ---
+    window.handleBorrow = async (bookId, title, currentStock) => {
+        if (currentStock <= 0) return;
+        
+        try {
+            // Decrement Stock
+            await updateDoc(doc(db, "books", bookId), { stock: currentStock - 1 });
+            
+            // Record Borrow
+            await addDoc(collection(db, "borrows"), {
+                userId: currentUser.uid,
+                userName: currentUser.name,
+                bookId: bookId,
+                bookTitle: title,
+                status: "Active",
+                timestamp: Date.now()
+            });
+
+        } catch (error) {
+            console.error("Error borrowing book:", error);
+            alert("Failed to borrow book. Check Firestore security rules.");
+        }
+    }
+
+    // --- 7. NAVIGATION LOGIC ---
+    document.querySelectorAll('.nav-item').forEach(item => {
+        item.addEventListener('click', (e) => {
+            // UI Update
+            document.querySelectorAll('.nav-item').forEach(nav => nav.classList.remove('active'));
+            e.currentTarget.classList.add('active');
+            
+            // View Switching
+            const target = e.currentTarget.getAttribute('data-target');
+            document.querySelectorAll('.view-section').forEach(view => view.classList.add('hidden'));
+            document.getElementById(`view-${target}`).classList.remove('hidden');
+            
+            // Title Update
+            document.getElementById('page-title').innerText = e.currentTarget.innerText.trim();
+        });
+    });
+
+    // --- 8. INITIAL SEED (Only runs if DB is completely empty) ---
+    async function seedBooks() {
+        const sampleData = [
+            { title: "Clean Code", author: "Robert C. Martin", category: "Programming", stock: 5 },
+            { title: "The Pragmatic Programmer", author: "Andrew Hunt", category: "Software", stock: 3 },
+            { title: "Design Patterns", author: "Gang of Four", category: "Architecture", stock: 2 }
+        ];
+        for (const book of sampleData) {
+            await addDoc(collection(db, "books"), book);
+        }
+    }
+</script>
+
+</body>
+</html>
