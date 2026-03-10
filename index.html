@@ -218,18 +218,20 @@
 </div>
 
 <script type="module">
-    // --- 1. FIREBASE SETUP ---
+    // --- 1. FIREBASE SETUP (UPDATED CONFIG) ---
     import { initializeApp } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-app.js";
     import { getAuth, signInWithPopup, GoogleAuthProvider, onAuthStateChanged, signOut } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-auth.js";
     import { getFirestore, collection, doc, getDoc, setDoc, getDocs, addDoc, updateDoc, onSnapshot, query, where, orderBy } from "https://www.gstatic.com/firebasejs/12.10.0/firebase-firestore.js";
 
+    // YOUR NEW CONFIGURATION
     const firebaseConfig = {
-        apiKey: "AIzaSyAQYfWb81B89vmT0_ypZF3VNEhTtDV0hoA",
-        authDomain: "libraryhub-3e6be.firebaseapp.com",
-        projectId: "libraryhub-3e6be",
-        storageBucket: "libraryhub-3e6be.firebasestorage.app",
-        messagingSenderId: "843399614230",
-        appId: "1:843399614230:web:b8fca579c633f350908a37"
+        apiKey: "AIzaSyDiHrFOHJ3CSdvw0IFy8WGVZKoxwseyjV4",
+        authDomain: "libraryhub-8c0e4.firebaseapp.com",
+        projectId: "libraryhub-8c0e4",
+        storageBucket: "libraryhub-8c0e4.firebasestorage.app",
+        messagingSenderId: "228447572974",
+        appId: "1:228447572974:web:50882634c28528d5e774ff",
+        measurementId: "G-C8R918WE69"
     };
 
     const app = initializeApp(firebaseConfig);
@@ -319,7 +321,7 @@
         onSnapshot(collection(db, "books"), (snapshot) => {
             booksData = snapshot.docs.map(doc => ({ id: doc.id, ...doc.data() }));
             
-            // Seed sample data if empty
+            // Seed sample data if empty (useful for fresh databases!)
             if(booksData.length === 0) seedBooks(); 
 
             renderCatalog();
